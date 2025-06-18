@@ -16,6 +16,7 @@
         "default_popup": "popup.html",
         "default_title": "Create Event from JIRA"
     },
+    "key": "1QEYgtYGfMkN0aW2E+PQZlFpqKvYnsma5DWDjFs8PCM=",
     "content_scripts": [
         {
             "matches": [
