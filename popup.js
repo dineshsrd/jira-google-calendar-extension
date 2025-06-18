@@ -41,22 +41,21 @@ document.addEventListener('DOMContentLoaded', function () {
                     const jiraData = results[0].result;
                     console.log('Extracted JIRA data:', jiraData);
 
-                    // Display ticket info
-                    document.getElementById('ticketKey').textContent = jiraData.key || 'N/A';
-                    document.getElementById('ticketTitle').textContent = jiraData.title || 'N/A';
-                    document.getElementById('ticketSummary').textContent = jiraData.summary || 'N/A';
-                    ticketInfoDiv.style.display = 'block';
-
                     // Pre-fill form with JIRA data
                     // Use JIRA ID as event title (as requested)
                     if (jiraData.key) {
                         console.log('Setting event title to:', jiraData.key);
-                        document.getElementById('eventTitle').value = jiraData.key;
+                        document.getElementById('eventTitle').value = "[Discussion]: " + jiraData.key;
                     }
                     // Use JIRA title as event description (as requested)
                     if (jiraData.title) {
                         console.log('Setting event description to:', jiraData.title);
-                        document.getElementById('eventDescription').value = jiraData.title;
+                        let descriptionWithUrl = jiraData.title;
+                        // Add JIRA URL to description if available
+                        if (tab.url) {
+                            descriptionWithUrl = `${jiraData.title}\n\nJIRA Link: ${tab.url}`;
+                        }
+                        document.getElementById('eventDescription').value = descriptionWithUrl;
                     } else {
                         console.log('No JIRA title found');
                     }

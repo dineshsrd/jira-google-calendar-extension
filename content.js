@@ -186,9 +186,6 @@ function extractJiraData() {
             }
         }
 
-        // Add URL for reference
-        data.url = window.location.href;
-
         console.log('Extracted JIRA data:', data);
         return data;
 
