@@ -1,0 +1,38 @@
+{
+    "manifest_version": 3,
+    "name": "JIRA to Calendar Event Creator",
+    "version": "1.0",
+    "description": "Create calendar events from JIRA tickets with summary as description and title as event title",
+    "permissions": [
+        "activeTab",
+        "scripting",
+        "storage"
+    ],
+    "host_permissions": [
+        "https://*.atlassian.net/*",
+        "https://calendar.google.com/*"
+    ],
+    "action": {
+        "default_popup": "popup.html",
+        "default_title": "Create Event from JIRA"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "https://*.atlassian.net/*"
+            ],
+            "js": [
+                "content.js"
+            ],
+            "run_at": "document_end"
+        }
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "icons": {
+        "16": "icons/icon16.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
+    }
+}
