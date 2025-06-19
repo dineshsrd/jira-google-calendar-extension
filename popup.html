@@ -116,33 +116,18 @@
 
 <body>
     <div class="header">
-        <h2>🎯 JIRA to Calendar</h2>
-        <p>Create calendar events from JIRA tickets</p>
-    </div>
-
-    <div class="info-note">
-        <strong>💡 Note:</strong> The JIRA ID (e.g., PROJ-123) will be used as the event title, and the JIRA issue title
-        will be used as the event description.
-    </div>
-
-    <div id="ticketInfo" class="ticket-info" style="display: none;">
-        <h4>📋 Current Ticket</h4>
-        <p><strong>Key:</strong> <span id="ticketKey"></span></p>
-        <p><strong>Title:</strong> <span id="ticketTitle"></span></p>
-        <p><strong>Summary:</strong> <span id="ticketSummary"></span></p>
+        <h4>🎯 Create calendar events from JIRA tickets</h4>
     </div>
 
     <form id="eventForm">
         <div class="form-group">
             <label for="eventTitle">Event Title (from JIRA ID):</label>
-            <input type="text" id="eventTitle"
-                placeholder="Event title will be pre-filled with JIRA ID (e.g., PROJ-123)" required>
+            <input type="text" id="eventTitle" placeholder="Event title" required>
         </div>
 
         <div class="form-group">
-            <label for="eventDescription">Event Description (from JIRA title):</label>
-            <textarea id="eventDescription" placeholder="Event description will be pre-filled from JIRA issue title"
-                required></textarea>
+            <label for="eventDescription">Event Description (from JIRA title + URL):</label>
+            <textarea id="eventDescription" placeholder="Event description" required></textarea>
         </div>
 
         <div class="form-group">
@@ -158,10 +143,10 @@
         <div class="form-group">
             <label for="eventDuration">Duration (minutes):</label>
             <select id="eventDuration">
-                <option value="15">15 minutes</option>
+                <option value="15" selected>15 minutes</option>
                 <option value="30">30 minutes</option>
                 <option value="45">45 minutes</option>
-                <option value="60" selected>1 hour</option>
+                <option value="60">1 hour</option>
                 <option value="75">1 hour 15 minutes</option>
                 <option value="90">1.5 hours</option>
                 <option value="105">1 hour 45 minutes</option>
@@ -181,7 +166,6 @@
             <label for="calendarType">Calendar Type:</label>
             <select id="calendarType">
                 <option value="google">Google Calendar</option>
-                <option value="outlook">Outlook Calendar</option>
             </select>
         </div>
 
