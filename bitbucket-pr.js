@@ -69,8 +69,8 @@
             #bitbucket-pr-floating-btn {
                 position: fixed;
                 right: 20px;
-                top: 50%;
-                transform: translateY(-50%);
+                bottom: 20px;
+                transform: none;
                 z-index: 10000;
                 background: linear-gradient(135deg, #2684FF, #0052CC);
                 color: white;
@@ -89,6 +89,9 @@
             }
             #bitbucket-pr-floating-btn:hover {
                 transform: translateY(-50%) scale(1.1);
+            }
+            #bitbucket-pr-floating-btn.dragging {
+                cursor: grabbing;
             }
             #bitbucket-pr-modal {
                 position: fixed;
@@ -157,9 +160,36 @@
             }
         `;
         document.head.appendChild(style);
-        // Click handler
-        btn.addEventListener('click', function () {
-            openPRModal();
+        // Drag functionality
+        let isDragging = false;
+        let startY = 0;
+        let startTop = 0;
+        btn.addEventListener('mousedown', function (e) {
+            isDragging = true;
+            startY = e.clientY;
+            startTop = parseInt(window.getComputedStyle(btn).top);
+            btn.classList.add('dragging');
+            e.preventDefault();
+        });
+        document.addEventListener('mousemove', function (e) {
+            if (isDragging) {
+                const deltaY = e.clientY - startY;
+                const newTop = Math.max(20, Math.min(window.innerHeight - 70, startTop + deltaY));
+                btn.style.top = newTop + 'px';
+                btn.style.transform = 'none';
+            }
+        });
+        document.addEventListener('mouseup', function () {
+            if (isDragging) {
+                isDragging = false;
+                btn.classList.remove('dragging');
+            }
+        });
+        // Click handler (only if not dragging)
+        btn.addEventListener('click', function (e) {
+            if (!isDragging) {
+                openPRModal();
+            }
         });
     }
 

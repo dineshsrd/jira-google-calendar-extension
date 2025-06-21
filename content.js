@@ -26,8 +26,8 @@ function createFloatingIcon() {
         #jira-calendar-floating-icon {
             position: fixed;
             right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
+            bottom: 20px;
+            transform: none;
             z-index: 10000;
             cursor: pointer;
             user-select: none;

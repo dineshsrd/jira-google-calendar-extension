@@ -1,137 +1,149 @@
-# JIRA to Calendar Event Creator
+# JIRA & Bitbucket Chrome Extension
 
-A Chrome extension that helps you create calendar events from JIRA tickets. It automatically extracts the ticket title and description, and allows you to create events in Google Calendar or Outlook Calendar.
+A Chrome extension to streamline your workflow with JIRA and Bitbucket. Create calendar events from JIRA tickets, and quickly copy Bitbucket PR summaries for sharing.
+
+---
+
+## Table of Contents
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+  - [JIRA Ticket Workflow](#jira-ticket-workflow)
+  - [Bitbucket PR Workflow](#bitbucket-pr-workflow)
+- [Automated Release (GitHub Actions)](#automated-release-github-actions)
+- [Troubleshooting](#troubleshooting)
+- [Customization](#customization)
+- [File Structure](#file-structure)
+- [Security Notes](#security-notes)
+- [Support](#support)
+- [License](#license)
+
+---
 
 ## Features
 
-- 🎯 **Automatic JIRA Data Extraction**: Extracts ticket key, title, and description from JIRA pages
-- 📝 **Smart Description Mapping**: Uses JIRA issue summary as the event description automatically
-- ⏰ **15-Minute Time Intervals**: Precise time selection with 15-minute intervals (12:00, 12:15, 12:30, 12:45, etc.)
-- 📅 **Multiple Calendar Support**: Works with Google Calendar and Outlook Calendar
-- 👥 **Participant Management**: Add multiple participants via email addresses
-- ⏱️ **Flexible Duration**: Choose from 15 minutes to 4 hours with 15-minute increments
-- 🎨 **Clean UI**: Modern, user-friendly interface
-- 🔒 **Personal Use**: Designed for individual use, not for distribution
+- 🎯 **JIRA Integration**: Extracts ticket key, title, and description from JIRA pages
+- 📅 **Calendar Event Creation**: Create Google/Outlook calendar events from JIRA tickets
+- 🪄 **Bitbucket PR Floating Button**: Floating button on Bitbucket PR pages for quick summary sharing
+- 📋 **Copy PR Summary**: Modal to edit a custom message and copy PR info for Slack or email
+- 📝 **Robust Extraction**: Smart selectors for both JIRA and Bitbucket to handle most layouts
+- ⏰ **15-Minute Time Intervals**: Precise time selection for events
+- 👥 **Participant Management**: Add multiple participants via email
+- ⏱️ **Flexible Duration**: Choose from 15 minutes to 4 hours
+- 🎨 **Modern UI**: Clean, user-friendly interface
+- 🤖 **Automated Release**: GitHub Actions workflow to pack and release the extension
+
+---
 
 ## Installation
 
 ### For Personal Use (Developer Mode)
 
 1. **Download the Extension Files**
-   - Download all files from the `chrome-extension` folder
+   - Download all files from the repository
    - Keep the folder structure intact
 
 2. **Open Chrome Extensions Page**
-   - Open Chrome and go to `chrome://extensions/`
-   - Or navigate to: Chrome Menu → More Tools → Extensions
+   - Go to `chrome://extensions/`
+   - Or: Chrome Menu → More Tools → Extensions
 
 3. **Enable Developer Mode**
-   - Toggle the "Developer mode" switch in the top-right corner
+   - Toggle the "Developer mode" switch (top-right corner)
 
 4. **Load the Extension**
    - Click "Load unpacked"
-   - Select the `chrome-extension` folder containing all the extension files
+   - Select the extension folder
    - The extension should now appear in your extensions list
 
 5. **Pin the Extension (Optional)**
    - Click the puzzle piece icon in Chrome's toolbar
-   - Find "JIRA to Calendar Event Creator" and click the pin icon
+   - Find the extension and click the pin icon
+
+---
 
 ## Usage
 
+### JIRA Ticket Workflow
 1. **Navigate to a JIRA Ticket**
-   - Go to any JIRA ticket page (e.g., `https://your-domain.atlassian.net/browse/PROJ-123`)
-
+   - Example: `https://your-domain.atlassian.net/browse/PROJ-123`
 2. **Open the Extension**
    - Click the extension icon in your Chrome toolbar
-   - Or right-click on the page and select "Create Calendar Event from JIRA"
-
-3. **Review Extracted Data**
-   - The extension will automatically extract and display:
-     - Ticket Key (e.g., PROJ-123)
-     - Ticket Title
-     - Ticket Summary (used as event description)
-
-4. **Configure Event Details**
-   - **Event Title**: Pre-filled with JIRA title (can be modified)
-   - **Event Description**: Pre-filled with JIRA summary (can be modified)
-   - **Date & Time**: Set your preferred date and time with 15-minute precision
-   - **Duration**: Choose from 15 minutes to 4 hours with 15-minute increments
-   - **Participants**: Add email addresses (comma-separated)
-   - **Calendar Type**: Choose Google Calendar or Outlook Calendar
-
-5. **Create the Event**
+3. **Review & Configure**
+   - The extension extracts ticket key, title, and summary
+   - Configure event details (date, time, duration, participants, calendar type)
+4. **Create the Event**
    - Click "Create Calendar Event"
-   - A new tab will open with your calendar service
-   - The event details will be pre-filled
-   - Review and save the event
+   - A new tab opens with your calendar service, pre-filled with event details
 
-## Key Features Explained
+### Bitbucket PR Workflow
+1. **Navigate to a Bitbucket PR**
+   - Example: `https://bitbucket.org/<workspace>/<repo>/pull-requests/<id>`
+2. **Use the Floating Button**
+   - Click the floating 🔗 button on the right side of the page
+3. **Edit and Copy**
+   - Edit the custom message if needed
+   - Review the PR title and description
+   - Click "Copy to Clipboard" to copy a summary like:
+     ```
+     @teamx Can someone please review and merge the below PR?
 
-### 🎯 Smart Data Mapping
-- **JIRA Title** → **Event Title**: The main ticket title becomes the calendar event title
-- **JIRA Summary** → **Event Description**: The ticket's detailed summary/description becomes the event description
-- **Automatic Pre-filling**: Both fields are automatically populated and can be edited
+     Summary: ESM-5419 created PO v2 tables
 
-### ⏰ 15-Minute Time Precision
-- **Time Selection**: Dropdown with 15-minute intervals (12:00, 12:15, 12:30, 12:45, etc.)
-- **Smart Default**: Automatically sets to current time + 1 hour, rounded to nearest 15 minutes
-- **24-Hour Coverage**: Available times from 12:00 AM to 11:45 PM
+     PR Link: https://bitbucket.org/atlassian/python-bitbucket/pull-requests/1
+     ```
 
-### ⏱️ Flexible Duration Options
-- **15 minutes** - Quick meetings
-- **30 minutes** - Standard meetings
-- **45 minutes** - Extended discussions
-- **1 hour** - Default selection
-- **1 hour 15 minutes** - Extended meetings
-- **1.5 hours** - Workshops
-- **1 hour 45 minutes** - Long discussions
-- **2 hours** - Training sessions
-- **2.5 hours** - Extended workshops
-- **3 hours** - Half-day sessions
-- **4 hours** - Full sessions
+---
 
-## Supported JIRA Elements
+## Automated Release (GitHub Actions)
 
-The extension automatically detects and extracts:
+This repo includes a GitHub Actions workflow to automatically pack and release the extension as a zip file on every version tag push.
 
-- **Ticket Key**: From breadcrumbs and issue links
-- **Title**: From the main heading and summary fields
-- **Summary/Description**: From the description field and content areas
+### How it works
+- On every push to a tag like `v1.0.0`, the workflow zips up all extension files and creates a GitHub Release with the zip attached.
 
-## Calendar Integration
+### How to trigger a release
+1. Commit and push all your changes.
+2. Tag a release and push the tag:
+   ```sh
+   git tag v1.0.0
+   git push origin v1.0.0
+   ```
+3. The workflow will run and create a release with `chrome-extension.zip` attached.
 
-### Google Calendar
-- Opens Google Calendar with pre-filled event details
-- Supports participants via email addresses
-- Uses Google Calendar's URL parameters for seamless integration
-
-### Outlook Calendar
-- Opens Outlook Calendar with pre-filled event details
-- Supports participants via email addresses
-- Uses Outlook's deep linking for calendar events
+---
 
 ## Troubleshooting
 
-### Extension Not Working on JIRA Pages
-- Make sure you're on a JIRA page (URL contains `atlassian.net`)
-- Refresh the page and try again
-- Check the browser console for any error messages
+- **Extension Not Working on JIRA/Bitbucket Pages**
+  - Make sure you're on a supported page (JIRA: `atlassian.net`, Bitbucket: PR page)
+  - Refresh the page and try again
+  - Check the browser console for any error messages
+- **Data Not Extracting Properly**
+  - The extension uses multiple selectors to find elements
+  - If your instance has custom styling, some elements might not be detected
+  - Try refreshing the page or navigating to a different ticket/PR
+- **Calendar Event Not Creating**
+  - Ensure you're logged into your Google/Outlook account
+  - Check that the date and time are valid
+  - Verify email addresses are in the correct format
+- **GitHub Release Fails**
+  - Ensure your workflow permissions are set to "Read and write"
+  - If using a fork, use a Personal Access Token (PAT) with `repo` and `workflow` scopes
 
-### Data Not Extracting Properly
-- The extension uses multiple selectors to find JIRA elements
-- If your JIRA instance has custom styling, some elements might not be detected
-- Try refreshing the page or navigating to a different ticket
+---
 
-### Calendar Event Not Creating
-- Ensure you're logged into your Google/Outlook account
-- Check that the date and time are valid
-- Verify email addresses are in the correct format
+## Customization
 
-### Time Not Showing Correctly
-- The extension rounds to the nearest 15-minute interval
-- If you need a specific time, manually select it from the dropdown
-- The default time is current time + 1 hour, rounded to nearest 15 minutes
+- **Icons**: Place your own icon files in the `icons/` folder (`icon16.png`, `icon48.png`, `icon128.png`)
+- **JIRA Selectors**: Modify selectors in `content.js` if your JIRA instance uses custom HTML
+- **Bitbucket Selectors**: Modify selectors in `bitbucket-pr.js` if your Bitbucket PR layout is different
+- **Default Values**: Change default duration or calendar type in `popup.js`:
+  ```js
+  document.getElementById('eventDuration').value = '60';
+  document.getElementById('calendarType').value = 'google';
+  ```
+
+---
 
 ## File Structure
 
@@ -141,49 +153,38 @@ chrome-extension/
 ├── popup.html            # Extension popup interface
 ├── popup.js              # Popup functionality
 ├── content.js            # Content script for JIRA pages
+├── bitbucket-pr.js       # Content script for Bitbucket PR pages
 ├── background.js         # Background service worker
 ├── README.md             # This file
-└── icons/                # Extension icons (create your own)
+├── INSTALL.md            # Installation instructions
+├── SUMMARY.md            # Feature summary
+├── generate-icons.js     # Icon generation helper
+└── icons/                # Extension icons
     ├── icon16.png
     ├── icon48.png
     └── icon128.png
 ```
 
-## Customization
-
-### Adding Icons
-Create your own icon files in the `icons/` folder:
-- `icon16.png` (16x16 pixels)
-- `icon48.png` (48x48 pixels)
-- `icon128.png` (128x128 pixels)
-
-### Modifying Selectors
-If the extension doesn't work with your JIRA instance, you can modify the selectors in `content.js` to match your JIRA's HTML structure.
-
-### Changing Default Values
-You can modify the default duration or calendar type in `popup.js`:
-```javascript
-// Default duration (in minutes)
-document.getElementById('eventDuration').value = '60';
-
-// Default calendar type
-document.getElementById('calendarType').value = 'google';
-```
+---
 
 ## Security Notes
 
-- This extension only runs on JIRA pages (`*.atlassian.net`)
+- This extension only runs on JIRA and Bitbucket PR pages
 - No data is stored or transmitted to external servers
 - All processing happens locally in your browser
 - Calendar integration uses official deep linking URLs
+
+---
 
 ## Support
 
 This is a personal-use extension. For issues or improvements:
 1. Check the browser console for error messages
-2. Verify you're on a supported JIRA page
+2. Verify you're on a supported JIRA or Bitbucket PR page
 3. Ensure all required fields are filled in the form
-4. Test with different JIRA tickets
+4. Test with different tickets/PRs
+
+---
 
 ## License
 
