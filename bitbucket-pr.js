@@ -178,7 +178,7 @@
                 <div class="bitbucket-pr-summary" id="bitbucket-pr-summary-block">
                     <div style="margin-bottom: 15px;">
                         <strong>Custom Message:</strong><br>
-                        <input type="text" id="custom-message" value="Can someone please review and merge the below PR?" style="width: 100%; max-width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ddd; border-radius: 3px; margin-top: 5px;">
+                        <input type="text" id="custom-message" value="@teamx Can someone please review and merge the below PR?" style="width: 100%; max-width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ddd; border-radius: 3px; margin-top: 5px;">
                     </div>
                     <div style="margin-bottom: 15px;">
                         <strong>Summary:</strong><br/>
