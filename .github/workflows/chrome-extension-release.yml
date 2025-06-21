@@ -1,0 +1,41 @@
+name: Pack and Release Chrome Extension
+
+on:
+  push:
+    tags:
+      - 'v*'  # Triggers on version tags like v1.0, v2.1.3, etc.
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Pack Chrome Extension
+        run: |
+          zip -r chrome-extension.zip \
+            manifest.json \
+            background.js \
+            content.js \
+            bitbucket-pr.js \
+            popup.html \
+            popup.js \
+            README.md \
+            INSTALL.md \
+            SUMMARY.md \
+            icons/ \
+            generate-icons.js
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: chrome-extension.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
