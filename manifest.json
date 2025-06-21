@@ -26,6 +26,15 @@
                 "content.js"
             ],
             "run_at": "document_end"
+        },
+        {
+            "matches": [
+                "https://bitbucket.org/*/*/pull-requests/*"
+            ],
+            "js": [
+                "bitbucket-pr.js"
+            ],
+            "run_at": "document_end"
         }
     ],
     "background": {
