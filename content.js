@@ -123,6 +123,13 @@ function openEventCreationForm() {
                 </div>
                 <div class="jira-calendar-modal-body">
                     <div class="form-group">
+                        <label for="eventType">Event Type:</label>
+                        <select id="eventType">
+                            <option value="meeting">Meeting</option>
+                            <option value="focus">Focus Time</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label for="eventTitle">Event Title:</label>
                         <input type="text" id="eventTitle" placeholder="Event title" required>
                     </div>
@@ -154,7 +161,7 @@ function openEventCreationForm() {
                             <option value="240">4 hours</option>
                         </select>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" id="participantsGroup">
                         <label for="participants">Participants (comma-separated emails):</label>
                         <input type="text" id="participants" placeholder="email1@example.com, email2@example.com">
                     </div>
@@ -303,7 +310,13 @@ function openEventCreationForm() {
     // Extract and fill JIRA data
     const jiraData = extractJiraData();
     if (jiraData.key) {
-        document.getElementById('eventTitle').value = "[Discussion]: " + jiraData.key;
+        // Set title based on event type
+        const eventType = document.getElementById('eventType').value;
+        if (eventType === 'focus') {
+            document.getElementById('eventTitle').value = `🎯 Focusing on: ${jiraData.title || jiraData.key}`;
+        } else {
+            document.getElementById('eventTitle').value = "[Discussion]: " + jiraData.key;
+        }
     }
     if (jiraData.title) {
         let descriptionWithUrl = jiraData.title;
@@ -312,6 +325,9 @@ function openEventCreationForm() {
         }
         document.getElementById('eventDescription').value = descriptionWithUrl;
     }
+
+    // Handle initial event type setup
+    handleEventTypeChange();
 
     // Add event listeners
     document.querySelector('.jira-calendar-close-btn').addEventListener('click', function () {
@@ -322,12 +338,46 @@ function openEventCreationForm() {
         createCalendarEvent();
     });
 
+    // Handle event type changes
+    document.getElementById('eventType').addEventListener('change', function () {
+        handleEventTypeChange();
+    });
+
     // Close modal when clicking outside
     modal.addEventListener('click', function (e) {
         if (e.target === modal) {
             modal.remove();
         }
     });
+}
+
+// Function to handle event type changes
+function handleEventTypeChange() {
+    const eventType = document.getElementById('eventType').value;
+    const participantsGroup = document.getElementById('participantsGroup');
+    const eventTitle = document.getElementById('eventTitle');
+
+    if (eventType === 'focus') {
+        // Hide participants for focus time
+        participantsGroup.style.display = 'none';
+
+        // Update title to use issue title
+        const jiraData = extractJiraData();
+        if (jiraData.title) {
+            eventTitle.value = `🎯 Focusing on: ${jiraData.title}`;
+        } else if (jiraData.key) {
+            eventTitle.value = `🎯 Focusing on: ${jiraData.key}`;
+        }
+    } else {
+        // Show participants for meetings
+        participantsGroup.style.display = 'block';
+
+        // Update title to use JIRA key
+        const jiraData = extractJiraData();
+        if (jiraData.key) {
+            eventTitle.value = "[Discussion]: " + jiraData.key;
+        }
+    }
 }
 
 // Function to create calendar event
@@ -345,7 +395,7 @@ async function createCalendarEvent() {
             date: document.getElementById('eventDate').value,
             time: document.getElementById('eventTime').value,
             duration: parseInt(document.getElementById('eventDuration').value),
-            participants: document.getElementById('participants').value,
+            participants: document.getElementById('eventType').value === 'focus' ? '' : document.getElementById('participants').value,
             calendarType: document.getElementById('calendarType').value
         };
 
@@ -386,7 +436,7 @@ async function createGoogleCalendarEvent(formData) {
     calendarUrl.searchParams.set('dates', `${startDate}/${endDate}`);
     calendarUrl.searchParams.set('details', formData.description);
 
-    if (formData.participants) {
+    if (formData.participants && formData.participants.trim()) {
         const emails = formData.participants.split(',').map(email => email.trim()).filter(email => email);
         if (emails.length > 0) {
             calendarUrl.searchParams.set('add', emails.join(','));

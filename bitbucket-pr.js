@@ -221,6 +221,7 @@
                     </div>
                 </div>
                 <button class="bitbucket-pr-copy-btn">Copy to Clipboard</button>
+                <button class="bitbucket-pr-schedule-btn" style="background:#36b37e; color:white; border:none; border-radius:3px; padding:10px 20px; font-size:15px; cursor:pointer; width:100%; margin-top:10px;">Schedule Meeting</button>
                 <div class="bitbucket-pr-copied" style="display:none;">Copied!</div>
             </div>
         `;
@@ -241,6 +242,11 @@
                 setTimeout(() => { copied.style.display = 'none'; }, 1500);
             });
         };
+        // Schedule Meeting button
+        modal.querySelector('.bitbucket-pr-schedule-btn').onclick = () => {
+            modal.remove();
+            openScheduleMeetingModal(pr);
+        };
         // Close modal on overlay click
         modal.onclick = (e) => {
             if (e.target === modal) {
@@ -248,6 +254,174 @@
                 createFloatingButton();
             }
         };
+    }
+
+    // Schedule Meeting Modal
+    function openScheduleMeetingModal(pr) {
+        // Remove any existing modal
+        const existingModal = document.getElementById('bitbucket-pr-modal');
+        if (existingModal) existingModal.remove();
+        const modal = document.createElement('div');
+        modal.id = 'bitbucket-pr-modal';
+        // Default values
+        const today = new Date();
+        const todayStr = today.toISOString().split('T')[0];
+        const nextHour = new Date(today.getTime() + 60 * 60 * 1000);
+        const timeStr = nextHour.toTimeString().slice(0, 5);
+        modal.innerHTML = `
+            <div class="bitbucket-pr-modal-content">
+                <button class="bitbucket-pr-close-btn" title="Close">&times;</button>
+                <h3>Schedule Meeting for PR</h3>
+                <div class="form-group">
+                    <label for="eventType">Event Type:</label>
+                    <select id="eventType">
+                        <option value="meeting">Meeting</option>
+                        <option value="focus">Focus Time</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="eventTitle">Event Title:</label>
+                    <input type="text" id="eventTitle" value="[Discussion]: ${pr.title || ''}" required>
+                </div>
+                <div class="form-group">
+                    <label for="eventDescription">Event Description:</label>
+                    <textarea id="eventDescription" required>${pr.description ? pr.description + '\n\nPR Link: ' + pr.url : 'PR Link: ' + pr.url}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="eventDate">Event Date:</label>
+                    <input type="date" id="eventDate" value="${todayStr}" required>
+                </div>
+                <div class="form-group">
+                    <label for="eventTime">Event Time:</label>
+                    <input type="time" id="eventTime" value="${timeStr}" required>
+                </div>
+                <div class="form-group">
+                    <label for="eventDuration">Duration:</label>
+                    <select id="eventDuration">
+                        <option value="15">15 minutes</option>
+                        <option value="30">30 minutes</option>
+                        <option value="45">45 minutes</option>
+                        <option value="60" selected>1 hour</option>
+                        <option value="90">1.5 hours</option>
+                        <option value="120">2 hours</option>
+                    </select>
+                </div>
+                <div class="form-group" id="participantsGroup">
+                    <label for="participants">Participants (comma-separated emails):</label>
+                    <input type="text" id="participants" placeholder="email1@example.com, email2@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="calendarType">Calendar Type:</label>
+                    <select id="calendarType">
+                        <option value="google">Google Calendar</option>
+                        <option value="outlook">Outlook Calendar</option>
+                    </select>
+                </div>
+                <button type="button" id="createEventBtn" class="bitbucket-pr-copy-btn" style="background:#0052CC;">Create Calendar Event</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        // Close
+        modal.querySelector('.bitbucket-pr-close-btn').onclick = () => {
+            modal.remove();
+            createFloatingButton();
+        };
+        // Handle event type changes
+        modal.querySelector('#eventType').addEventListener('change', function () {
+            handleEventTypeChange(pr);
+        });
+        // Create Event
+        modal.querySelector('#createEventBtn').onclick = async () => {
+            const formData = {
+                title: document.getElementById('eventTitle').value,
+                description: document.getElementById('eventDescription').value,
+                date: document.getElementById('eventDate').value,
+                time: document.getElementById('eventTime').value,
+                duration: parseInt(document.getElementById('eventDuration').value),
+                participants: document.getElementById('eventType').value === 'focus' ? '' : document.getElementById('participants').value,
+                calendarType: document.getElementById('calendarType').value
+            };
+            if (!formData.title || !formData.description || !formData.date || !formData.time) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            if (formData.calendarType === 'google') {
+                createGoogleCalendarEvent(formData);
+            } else if (formData.calendarType === 'outlook') {
+                createOutlookCalendarEvent(formData);
+            }
+            modal.remove();
+            createFloatingButton();
+        };
+        // Close modal on overlay click
+        modal.onclick = (e) => {
+            if (e.target === modal) {
+                modal.remove();
+                createFloatingButton();
+            }
+        };
+    }
+
+    function handleEventTypeChange(pr) {
+        const eventType = document.getElementById('eventType').value;
+        const participantsGroup = document.getElementById('participantsGroup');
+        const eventTitle = document.getElementById('eventTitle');
+
+        if (eventType === 'focus') {
+            // Hide participants for focus time
+            participantsGroup.style.display = 'none';
+
+            // Update title to use PR title
+            if (pr.title) {
+                eventTitle.value = `🎯 Focusing on: ${pr.title}`;
+            }
+        } else {
+            // Show participants for meetings
+            participantsGroup.style.display = 'block';
+
+            // Update title to use PR title
+            if (pr.title) {
+                eventTitle.value = "[Discussion]: " + pr.title;
+            }
+        }
+    }
+
+    function createGoogleCalendarEvent(formData) {
+        const startDateTime = new Date(`${formData.date}T${formData.time}`);
+        const endDateTime = new Date(startDateTime.getTime() + formData.duration * 60 * 1000);
+        const startDate = startDateTime.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+        const endDate = endDateTime.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+        const calendarUrl = new URL('https://calendar.google.com/calendar/render');
+        calendarUrl.searchParams.set('action', 'TEMPLATE');
+        calendarUrl.searchParams.set('text', formData.title);
+        calendarUrl.searchParams.set('dates', `${startDate}/${endDate}`);
+        calendarUrl.searchParams.set('details', formData.description);
+        if (formData.participants && formData.participants.trim()) {
+            const emails = formData.participants.split(',').map(email => email.trim()).filter(email => email);
+            if (emails.length > 0) {
+                calendarUrl.searchParams.set('add', emails.join(','));
+            }
+        }
+        window.open(calendarUrl.toString(), '_blank');
+    }
+
+    function createOutlookCalendarEvent(formData) {
+        const startDateTime = new Date(`${formData.date}T${formData.time}`);
+        const endDateTime = new Date(startDateTime.getTime() + formData.duration * 60 * 1000);
+        const startDate = startDateTime.toISOString();
+        const endDate = endDateTime.toISOString();
+        const calendarUrl = new URL('https://outlook.office.com/calendar/0/deeplink/compose');
+        calendarUrl.searchParams.set('subject', formData.title);
+        calendarUrl.searchParams.set('startdt', startDate);
+        calendarUrl.searchParams.set('enddt', endDate);
+        calendarUrl.searchParams.set('body', formData.description);
+        if (formData.participants && formData.participants.trim()) {
+            const emails = formData.participants.split(',').map(email => email.trim()).filter(email => email);
+            if (emails.length > 0) {
+                calendarUrl.searchParams.set('to', emails.join(','));
+            }
+        }
+        window.open(calendarUrl.toString(), '_blank');
     }
 
     // Observe for SPA navigation (Bitbucket is SPA)

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Type Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f5f7;
+        }
+
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #172b4d;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #dfe1e6;
+            border-radius: 3px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .test-button {
+            background: #0052cc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .test-button:hover {
+            background: #0047b3;
+        }
+
+        .results {
+            background: #e3fcef;
+            border: 1px solid #36b37e;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🧪 Event Type Test Page</h1>
+
+    <div class="test-container">
+        <h2>Test Event Type Functionality</h2>
+        <p>This page tests the event type dropdown functionality for both Meeting and Focus Time modes.</p>
+
+        <form id="testForm">
+            <div class="form-group">
+                <label for="eventType">Event Type:</label>
+                <select id="eventType">
+                    <option value="meeting">Meeting</option>
+                    <option value="focus">Focus Time</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="eventTitle">Event Title:</label>
+                <input type="text" id="eventTitle" placeholder="Event title" required>
+            </div>
+
+            <div class="form-group">
+                <label for="eventDescription">Event Description:</label>
+                <textarea id="eventDescription" placeholder="Event description" required></textarea>
+            </div>
+
+            <div class="form-group" id="participantsGroup">
+                <label for="participants">Participants (comma-separated emails):</label>
+                <input type="text" id="participants" placeholder="email1@example.com, email2@example.com">
+            </div>
+
+            <button type="button" class="test-button" onclick="testEventTypeChange()">Test Event Type Change</button>
+        </form>
+
+        <div id="results" class="results" style="display: none;">
+            <h3>Test Results:</h3>
+            <pre id="test-results"></pre>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>Expected Behavior</h2>
+        <ul>
+            <li><strong>Meeting Mode:</strong>
+                <ul>
+                    <li>Participants field is visible</li>
+                    <li>Title format: "[Discussion]: JIRA-123"</li>
+                    <li>Participants are included in calendar events</li>
+                </ul>
+            </li>
+            <li><strong>Focus Time Mode:</strong>
+                <ul>
+                    <li>Participants field is hidden</li>
+                    <li>Title format: "🎯 Focusing on: Issue Title"</li>
+                    <li>No participants in calendar events</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <script>
+        // Mock JIRA data for testing
+        const mockJiraData = {
+            key: 'PROJ-123',
+            title: 'Implement user authentication system',
+            description: 'This ticket involves implementing a comprehensive user authentication system.'
+        };
+
+        // Initialize form with mock data
+        document.getElementById('eventTitle').value = '[Discussion]: ' + mockJiraData.key;
+        document.getElementById('eventDescription').value = mockJiraData.title + '\n\nJIRA Link: https://example.atlassian.net/browse/PROJ-123';
+
+        // Handle event type changes
+        document.getElementById('eventType').addEventListener('change', function () {
+            handleEventTypeChange();
+        });
+
+        function handleEventTypeChange() {
+            const eventType = document.getElementById('eventType').value;
+            const participantsGroup = document.getElementById('participantsGroup');
+            const eventTitle = document.getElementById('eventTitle');
+
+            if (eventType === 'focus') {
+                // Hide participants for focus time
+                participantsGroup.style.display = 'none';
+
+                // Update title to use issue title
+                eventTitle.value = `🎯 Focusing on: ${mockJiraData.title}`;
+            } else {
+                // Show participants for meetings
+                participantsGroup.style.display = 'block';
+
+                // Update title to use JIRA key
+                eventTitle.value = "[Discussion]: " + mockJiraData.key;
+            }
+        }
+
+        function testEventTypeChange() {
+            const eventType = document.getElementById('eventType').value;
+            const participantsVisible = document.getElementById('participantsGroup').style.display !== 'none';
+            const eventTitle = document.getElementById('eventTitle').value;
+
+            const results = {
+                eventType: eventType,
+                participantsVisible: participantsVisible,
+                eventTitle: eventTitle,
+                expectedBehavior: eventType === 'focus' ? 'Focus Time' : 'Meeting'
+            };
+
+            const resultsDiv = document.getElementById('results');
+            const resultsPre = document.getElementById('test-results');
+
+            resultsPre.textContent = JSON.stringify(results, null, 2);
+            resultsDiv.style.display = 'block';
+
+            console.log('Event type test results:', results);
+        }
+
+        // Initialize the form
+        handleEventTypeChange();
+    </script>
+</body>
+
+</html>

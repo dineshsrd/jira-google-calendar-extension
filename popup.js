@@ -17,6 +17,11 @@ document.addEventListener('DOMContentLoaded', function () {
     // Extract JIRA ticket information when popup opens
     extractJiraTicketInfo();
 
+    // Handle event type changes
+    document.getElementById('eventType').addEventListener('change', function () {
+        handleEventTypeChange();
+    });
+
     form.addEventListener('submit', function (e) {
         e.preventDefault();
         createCalendarEvent();
@@ -42,12 +47,17 @@ document.addEventListener('DOMContentLoaded', function () {
                     console.log('Extracted JIRA data:', jiraData);
 
                     // Pre-fill form with JIRA data
-                    // Use JIRA ID as event title (as requested)
                     if (jiraData.key) {
                         console.log('Setting event title to:', jiraData.key);
-                        document.getElementById('eventTitle').value = "[Discussion]: " + jiraData.key;
+                        // Set title based on event type
+                        const eventType = document.getElementById('eventType').value;
+                        if (eventType === 'focus') {
+                            document.getElementById('eventTitle').value = `🎯 Focusing on: ${jiraData.title || jiraData.key}`;
+                        } else {
+                            document.getElementById('eventTitle').value = "[Discussion]: " + jiraData.key;
+                        }
                     }
-                    // Use JIRA title as event description (as requested)
+                    // Use JIRA title as event description
                     if (jiraData.title) {
                         console.log('Setting event description to:', jiraData.title);
                         let descriptionWithUrl = jiraData.title;
@@ -59,6 +69,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     } else {
                         console.log('No JIRA title found');
                     }
+
+                    // Handle initial event type setup
+                    handleEventTypeChange();
                 } else {
                     console.log('No JIRA data extracted');
                 }
@@ -86,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 date: document.getElementById('eventDate').value,
                 time: document.getElementById('eventTime').value,
                 duration: parseInt(document.getElementById('eventDuration').value),
-                participants: document.getElementById('participants').value,
+                participants: document.getElementById('eventType').value === 'focus' ? '' : document.getElementById('participants').value,
                 calendarType: document.getElementById('calendarType').value
             };
 
@@ -134,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function () {
         calendarUrl.searchParams.set('dates', `${startDate}/${endDate}`);
         calendarUrl.searchParams.set('details', formData.description);
 
-        if (formData.participants) {
+        if (formData.participants && formData.participants.trim()) {
             const emails = formData.participants.split(',').map(email => email.trim()).filter(email => email);
             if (emails.length > 0) {
                 calendarUrl.searchParams.set('add', emails.join(','));
@@ -160,7 +173,7 @@ document.addEventListener('DOMContentLoaded', function () {
         calendarUrl.searchParams.set('enddt', endDate);
         calendarUrl.searchParams.set('body', formData.description);
 
-        if (formData.participants) {
+        if (formData.participants && formData.participants.trim()) {
             const emails = formData.participants.split(',').map(email => email.trim()).filter(email => email);
             if (emails.length > 0) {
                 calendarUrl.searchParams.set('to', emails.join(','));
@@ -179,6 +192,34 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function hideStatus() {
         statusDiv.style.display = 'none';
+    }
+
+    function handleEventTypeChange() {
+        const eventType = document.getElementById('eventType').value;
+        const participantsGroup = document.getElementById('participantsGroup');
+        const eventTitle = document.getElementById('eventTitle');
+
+        if (eventType === 'focus') {
+            // Hide participants for focus time
+            participantsGroup.style.display = 'none';
+
+            // Update title to use issue title
+            const jiraData = window.extractJiraData ? window.extractJiraData() : {};
+            if (jiraData.title) {
+                eventTitle.value = `🎯 Focusing on: ${jiraData.title}`;
+            } else if (jiraData.key) {
+                eventTitle.value = `🎯 Focusing on: ${jiraData.key}`;
+            }
+        } else {
+            // Show participants for meetings
+            participantsGroup.style.display = 'block';
+
+            // Update title to use JIRA key
+            const jiraData = window.extractJiraData ? window.extractJiraData() : {};
+            if (jiraData.key) {
+                eventTitle.value = "[Discussion]: " + jiraData.key;
+            }
+        }
     }
 });
 
